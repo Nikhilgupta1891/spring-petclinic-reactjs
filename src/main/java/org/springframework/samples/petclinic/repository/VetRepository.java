@@ -16,9 +16,12 @@
 package org.springframework.samples.petclinic.repository;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.samples.petclinic.model.Specialty;
 import org.springframework.samples.petclinic.model.Vet;
 
 /**
@@ -39,5 +42,24 @@ public interface VetRepository extends Repository<Vet, Integer> {
      */
     Collection<Vet> findAll() throws DataAccessException;
 
+    /**
+     * Retrieve a {@link Vet} from the data store by id.
+     * @param id the id to search for
+     * @return the {@link Vet} if found
+     */
+	Vet findById(int id);
+
+    /**
+     * Save a {@link Vet} to the data store, either inserting or updating it.
+     * @param vet the {@link Vet} to save
+     */
+    void save(Vet vet);
+
+    /**
+     * Retrieve all {@link SpecialtyType}s from the data store.
+     * @return a Collection of {@link SpecialtyType}s.
+     */
+    @Query("SELECT stype FROM Specialty stype ORDER BY stype.name")
+	    List<Specialty> findSpecialtyTypes();
 
 }

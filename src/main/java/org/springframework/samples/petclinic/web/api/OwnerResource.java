@@ -16,14 +16,17 @@
 package org.springframework.samples.petclinic.web.api;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 import javax.validation.Valid;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.Vet;
+import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,7 +60,7 @@ public class OwnerResource extends AbstractResourceController {
 		}
 		return owner;
 	}
-
+	
 	/**
 	 * Create Owner
 	 */
@@ -67,9 +70,7 @@ public class OwnerResource extends AbstractResourceController {
 		if (bindingResult.hasErrors()) {
 			throw new InvalidRequestException("Invalid Owner", bindingResult);
 		}
-
 		this.clinicService.saveOwner(owner);
-
 		return owner;
 	}
 
@@ -103,7 +104,7 @@ public class OwnerResource extends AbstractResourceController {
 		if (bindingResult.hasErrors()) {
 			throw new InvalidRequestException("Invalid Owner", bindingResult);
 		}
-
+	
 		Owner ownerModel = retrieveOwner(ownerId);
 		// This is done by hand for simplicity purpose. In a real life use-case we
 		// should consider using MapStruct.

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -101,9 +102,21 @@ public class Pet extends NamedEntity {
         this.visits = visits;
     }
 
+    @JsonIgnore
+    public void cleanVisits() {
+    	this.visits = null;
+    }
+
     public List<Visit> getVisits() {
         List<Visit> sortedVisits = new ArrayList<>(getVisitsInternal());
         PropertyComparator.sort(sortedVisits, new MutableSortDefinition("date", false, false));
+		for(Visit visit: sortedVisits) {
+			Pet pet = visit.getPet();
+			if(Objects.isNull(pet)) {	
+				continue;
+			}
+			pet.cleanVisits();
+		}
         return Collections.unmodifiableList(sortedVisits);
     }
 

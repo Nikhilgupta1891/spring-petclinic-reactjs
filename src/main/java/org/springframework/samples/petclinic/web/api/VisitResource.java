@@ -15,14 +15,18 @@
  */
 package org.springframework.samples.petclinic.web.api;
 
+import java.util.Objects;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.Vet;
 import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,9 +49,10 @@ public class VisitResource extends AbstractResourceController {
 		this.clinicService = clinicService;
 	}
 
-	@PostMapping("/owners/{ownerId}/pets/{petId}/visits")
+	@PostMapping("/owners/{ownerId}/pets/{petId}/vets/{vetId}/visits")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void createÏ(@PathVariable("petId") int petId, @Valid @RequestBody Visit visit, BindingResult bindingResult) {
+	public void createVisit(@PathVariable("petId") int petId, @PathVariable("vetId") int vetId,
+			@Valid @RequestBody Visit visit, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			throw new InvalidRequestException("Visit is invalid", bindingResult);
 		}
@@ -57,8 +62,25 @@ public class VisitResource extends AbstractResourceController {
 			throw new BadRequestException("Pet with Id '" + petId + "' is unknown.");
 		}
 
+		final Vet vet = clinicService.findVetById(vetId);
+		if (Objects.isNull(vet)) {
+			throw new BadRequestException("Vet with Id '" + vetId + "' is unknown.");
+		}
+
 		pet.addVisit(visit);
+		vet.addVisit(visit);
 
 		clinicService.saveVisit(visit);
+	}
+
+	@DeleteMapping("/owners/{ownerId}/visits/{visitId}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteVisit(@PathVariable("visitId") int visitId) {
+		Visit visit = clinicService.findVisitById(visitId);
+		if (visit == null) {
+			throw new BadRequestException("Visit with Id '" + visitId + "' is unknown.");
+		}
+
+		clinicService.deleteVisit(visit);
 	}
 }

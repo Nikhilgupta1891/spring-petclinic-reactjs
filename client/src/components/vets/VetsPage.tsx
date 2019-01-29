@@ -45,12 +45,13 @@ export default class VetsPage extends React.Component<void, IVetsPageState> {
 
             {vets.map(vet => (
               <tr key={vet.id}>
-                <td>{vet.firstName} {vet.lastName}</td>
+                <td><Link to={`/vets/${vet.id}/edit`}>{vet.firstName} {vet.lastName}</Link></td>
                 <td>{vet.specialties.length > 0 ? vet.specialties.map(specialty => specialty.name).join(', ') : 'none'}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        <Link className='btn btn-default' to='/vets/new'> Add Vet</Link>
       </span>
     );
   }

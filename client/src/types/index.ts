@@ -56,6 +56,7 @@ interface IPerson extends IBaseEntity {
 export interface IVisit extends IBaseEntity {
   date: Date;
   description: string;
+  vet?: IVet;
 };
 
 export interface IPetType extends INamedEntity {

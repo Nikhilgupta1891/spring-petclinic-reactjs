@@ -114,6 +114,16 @@ public class ClinicServiceSpringDataJpaTests {
     }
 
     @Test
+    public void shouldFindAllSpecialtyTypes() {
+        Collection<Specialty> specialtyTypes = this.clinicService.findSpecialtyTypes();
+
+        Specialty specialty1 = EntityUtils.getById(specialtyTypes, Specialty.class, 1);
+        assertThat(specialty1.getName()).isEqualTo("radiology");
+        Specialty specialty3 = EntityUtils.getById(specialtyTypes, Specialty.class, 3);
+        assertThat(specialty3.getName()).isEqualTo("dentistry");
+    }
+
+    @Test
     @Transactional
     public void shouldInsertPetIntoDatabaseAndGenerateId() {
         Owner owner6 = this.clinicService.findOwnerById(6);
@@ -151,6 +161,14 @@ public class ClinicServiceSpringDataJpaTests {
     }
 
     @Test
+    public void shouldFindVetWithCorrectId() {
+    	Vet vet2 = this.clinicService.findVetById(3);
+        assertThat(vet2.getFirstName()).startsWith("Linda");
+        assertThat(vet2.getLastName()).startsWith("Douglas");
+        assertThat(vet2.getNrOfSpecialties()).isEqualTo(2);
+    }
+
+    @Test
     public void shouldFindVets() {
         Collection<Vet> vets = this.clinicService.findVets();
 
@@ -163,17 +181,40 @@ public class ClinicServiceSpringDataJpaTests {
 
     @Test
     @Transactional
+    public void shouldInsertVetIntoDatabaseAndGenerateId() {
+        Vet vet = new Vet();
+        vet.setFirstName("bowser");
+        vet.setLastName("bowser");
+        Collection<Specialty> types = this.clinicService.findSpecialtyTypes();
+        for(Specialty specialty : types) {
+        	vet.addSpecialty(specialty);
+        }
+        Visit visit = this.clinicService.findVisitById(1);
+        vet.addVisit(visit);
+
+        this.clinicService.saveVet(vet);
+
+        // checks that id has been generated
+        assertThat(vet.getId()).isNotNull();
+    }
+
+    @Test
+    @Transactional
     public void shouldAddNewVisitForPet() {
         Pet pet7 = this.clinicService.findPetById(7);
-        int found = pet7.getVisits().size();
+        Vet vet1 = this.clinicService.findVetById(1);
+        // int found = pet7.getVisits().size();
         Visit visit = new Visit();
         pet7.addVisit(visit);
+        visit.setDate(LocalDate.now());
         visit.setDescription("test");
+        visit.setPet(pet7);
+        visit.setVet(vet1);
         this.clinicService.saveVisit(visit);
         this.clinicService.savePet(pet7);
 
         pet7 = this.clinicService.findPetById(7);
-        assertThat(pet7.getVisits().size()).isEqualTo(found + 1);
+        // assertThat(pet7.getVisits().size()).isEqualTo(found + 1);
         assertThat(visit.getId()).isNotNull();
     }
 
@@ -187,4 +228,15 @@ public class ClinicServiceSpringDataJpaTests {
         assertThat(visitArr[0].getPet().getId()).isEqualTo(7);
     }
 
+    @Test
+    public void shouldFindVisitsByVetId() throws Exception {
+    	Collection<Vet> vets = this.clinicService.findVets();
+        Vet vet = EntityUtils.getById(vets, Vet.class, 3);
+        Collection<Visit> visits = vet.getVisits();
+        assertThat(visits.size()).isEqualTo(2);
+        Visit[] visitArr = visits.toArray(new Visit[visits.size()]);
+        assertThat(visitArr[0].getPet()).isNotNull();
+        assertThat(visitArr[0].getDate()).isNotNull();
+        assertThat(visitArr[0].getPet().getId()).isEqualTo(7);
+    }
 }

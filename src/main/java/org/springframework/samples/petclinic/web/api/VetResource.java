@@ -22,6 +22,9 @@ import org.springframework.samples.petclinic.model.Vet;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -41,12 +44,29 @@ public class VetResource extends AbstractResourceController {
         return this.clinicService.findVets();
     }
     
-    @GetMapping(value="/value/{vetId}")
-    public Vet findVet(@PathVariable("vetId") int vetId) {
+    public Vet retreiveVet(int vetId) {
         Vet vet = clinicService.getVetById(vetId);
         if(vet==null) {
             throw new BadRequestException("Vet with Id= " + vetId + " is unknown.");
         }
+        return vet;
+    }
+    
+    @GetMapping(value="/value/{vetId}")
+    public Vet findVet(@PathVariable("vetId") int vetId) {
+        return retreiveVet(vetId);
+    }
+    
+    @RequestMapping(value="/vets/{vetId}", method=RequestMethod.PUT)
+    public Vet updateVet(@PathVariable("vetId") int vetId, @RequestBody Vet vetRequest) {
+        // Fetch the VET based on ID
+        Vet vet = retreiveVet(vetId);
+        
+        // Get first and last name of Vet from request. 
+        vet.setFirstName(vetRequest.getFirstName());
+        vet.setLastName(vetRequest.getLastName());
+        
+        this.clinicService.saveVet(vet);
         return vet;
     }
 }

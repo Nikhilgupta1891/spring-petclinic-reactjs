@@ -52,4 +52,6 @@ public interface ClinicService {
 
     Vet getVetById(int vetId);
 
+    void saveVet(Vet vet);
+
 }

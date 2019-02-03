@@ -110,5 +110,13 @@ public class ClinicServiceImpl implements ClinicService {
 		return visitRepository.findByPetId(petId);
 	}
 
+    @Override
+    public Vet getVetById(int vetId) {
+        return vetRepository.findById(vetId);
+    }
 
+    @Override
+    public void saveVet(Vet vet) {
+       vetRepository.save(vet);
+    }
 }

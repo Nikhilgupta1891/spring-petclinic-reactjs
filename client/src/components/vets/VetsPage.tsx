@@ -51,6 +51,7 @@ export default class VetsPage extends React.Component<void, IVetsPageState> {
             ))}
           </tbody>
         </table>
+        <Link to='/vets/new' className='btn btn-default'> Add Vet </Link>
       </span>
     );
   }

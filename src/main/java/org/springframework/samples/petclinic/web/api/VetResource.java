@@ -52,6 +52,13 @@ public class VetResource extends AbstractResourceController {
         return vet;
     }
     
+    // You can't use "/vet/". It has to be exact URL coming to UI.
+    @RequestMapping(value="/vet", method=RequestMethod.POST)
+    public Vet createVet(@RequestBody Vet vet) {
+        this.clinicService.saveVet(vet);
+        return vet;
+    }
+    
     @GetMapping(value="/value/{vetId}")
     public Vet findVet(@PathVariable("vetId") int vetId) {
         return retreiveVet(vetId);
